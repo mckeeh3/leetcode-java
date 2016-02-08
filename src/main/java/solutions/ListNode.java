@@ -1,4 +1,4 @@
-package problems;
+package solutions;
 
 /**
  * Definition for singly-linked list.
