@@ -4,9 +4,14 @@ package problems;
  * Definition for singly-linked list.
  */
 public class ListNode {
-    int value;
+    int val;
     ListNode next;
     ListNode(int x) {
-        value = x;
+        val = x;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s[%d]", ListNode.class.getSimpleName(), val);
     }
 }
