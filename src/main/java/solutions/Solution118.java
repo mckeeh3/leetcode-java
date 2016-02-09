@@ -5,6 +5,8 @@ import java.util.List;
 
 /**
  * Given numRows, generate the first numRows of Pascal's triangle.
+ *
+ * @see <a href="https://leetcode.com/problems/pascals-triangle/">118. Pascal's Triangle</a>
  */
 public class Solution118 {
     public List<List<Integer>> generate(int numRows) {

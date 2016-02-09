@@ -3,6 +3,8 @@ package solutions;
 /**
  * Given a singly linked list, group all odd nodes together followed by the even nodes. Please note here we are talking
  * about the node number and not the value in the nodes.
+ *
+ * @see <a href="https://leetcode.com/problems/odd-even-linked-list/">328. Odd Even Linked List</a>
  */
 public class Solution328 {
     public ListNode oddEvenList(ListNode head) {

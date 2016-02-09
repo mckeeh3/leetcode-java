@@ -5,6 +5,8 @@ import java.util.List;
 
 /**
  * Given an index k, return the kth row of the Pascal's triangle.
+ *
+ * @see <a href="https://leetcode.com/problems/range-sum-query-immutable/">303. Range Sum Query - Immutable</a>
  */
 public class Solution119 {
     public List<Integer> getRow(int rowIndex) {
