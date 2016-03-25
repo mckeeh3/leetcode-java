@@ -123,6 +123,18 @@ public class Solution044Test {
     }
 
     @Test
+    public void isMatch_abStar_cdQuestion_iStar_de() {
+        Solution044 solution044 = new Solution044();
+        assertTrue(solution044.isMatch("abefcdgiescdfimde", "ab*cd?i*de"));
+    }
+
+    @Test
+    public void isMatchStar_aStar() {
+        Solution044 solution044 = new Solution044();
+        assertTrue(solution044.isMatch("bac", "*a*"));
+    }
+
+    @Test
     public void isNotMatch_aQuestion_deStar() {
         Solution044 solution044 = new Solution044();
         assertFalse(solution044.isMatch("abcdef", "a?de*"));

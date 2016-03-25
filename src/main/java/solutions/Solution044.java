@@ -1,8 +1,5 @@
 package solutions;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Implement wildcard pattern matching with support for '?' and '*'.
  * <p>'?' Matches any single character.<br>
@@ -36,58 +33,52 @@ public class Solution044 {
             int pos, posNext;
             if (e != null && !e.text.isEmpty()) {
                 if (e.prev == null && e.next == null) {
-                    pos = input.text(e).indexOf(e.text);
+                    pos = input.indexOf(e);
                     if (pos == 0) {
-                        e.span = !e.isSpanLimited() ? e.max
-                                : e.text.length() + e.min;
-                        input.trimLeft(e.span);
+                        e.span = !e.isSpanLimited() ? e.max : e.text.length() + e.min;
+                        input.trim(e);
                     }
                 } else if (e.prev == null) {
-                    pos = input.text(e).indexOf(e.text);
+                    pos = input.indexOf(e);
                     if (pos == 0) {
                         e.span = e.text.length() + e.min;
-                        input.trimLeft(e.span);
+                        input.trim(e);
                     }
                 } else if (e.next == null) {
-                    pos = e.prev.isSpanLimited()
-                            ? input.text(e).indexOf(e.text)
-                            : input.text(e).lastIndexOf(e.text);
+                    pos = input.indexOf(e);
                     if (pos == 0) {
                         e.span = e.text.length() + e.min;
-                        if (e.isSpanLimited()) {
-                            input.trimLeft(e.span);
-                        } else {
-                            input.trimAll();
-                        }
+                        input.trim(e);
                     } else if (pos > 0) {
                         if (!e.prev.isSpanLimited()) {
                             e.span = e.text.length() + e.min;
-                            input.trimLeft(pos + e.span);
                             e.prev.span += pos;
+                            input.trim(e);
                         }
                     }
                 } else if (e.prev.isSpanLimited()) {
-                    pos = input.text(e).indexOf(e.text);
+                    pos = input.indexOf(e);
                     if (pos == 0) {
                         e.span = e.text.length() + e.min;
-                        input.trimLeft(e.span);
+                        input.trim(e);
                     }
                 } else if (!e.next.text.isEmpty()) {
                     if (e.isSpanLimited()) {
-                        pos = input.text(e).indexOf(e.text);
-                        if (pos == 0) {
+                        pos = input.indexOf(e);
+                        if (pos >= 0) {
                             e.span = e.text.length() + e.min;
-                            input.trimLeft(e.span);
+                            e.prev.span += pos;
+                            input.trim(e);
                         }
                     } else {
-                        pos = input.text(e).indexOf(e.text);
+                        pos = input.indexOf(e);
                         if (pos >= 0) {
                             posNext = pos + e.text.length() + e.min;
                             posNext = input.text(e.next).indexOf(e.next.text, posNext);
                             if (posNext >= pos + e.text.length() + e.min) {
-                                e.span = posNext;
+                                e.span = e.text.length() + e.min;
                                 e.prev.span += pos;
-                                input.trimLeft(e.span);
+                                input.trim(e);
                             }
                         }
                     }
@@ -96,92 +87,40 @@ public class Solution044 {
                 if (e.prev == null && e.next == null) {
                     if (e.isSpanLimited() && e.min <= input.text().length()) {
                         e.span = e.min;
-                        input.trimLeft(e.span);
+                        input.trim(e);
                     } else if (!e.isSpanLimited() && e.min <= input.text().length()) {
                         e.span = input.text().length();
-                        input.trimAll();
+                        input.trim(e);
                     }
                 } else if (e.min <= input.text().length()) {
                     e.span = e.min;
-                    input.trimLeft(e.span);
+                    input.trim(e);
                 }
             }
         }
 
         static Expressions expressions(String regex) {
             Expressions es = new Expressions();
-            List<String> regularExpressions = parse(optimize(regex));
-            String text = "";
-            int max = 0;
-            int min = 0;
-
-            for (String r : regularExpressions) {
-                if ("*".equals(r)) {
-                    max = Integer.MAX_VALUE;
-                } else if ("?".equals(r)) {
-                    min++;
-                } else if (text.isEmpty()) {
-                    if (min > 0 || max > 0) {
-                        es.add(new Expression(text, min, max == 0 ? min : max));
-                        max = 0;
-                        min = 0;
-                    }
-                    text = r;
-                } else {
-                    es.add(new Expression(text, min, max == 0 ? min : max));
-                    text = r;
-                    max = 0;
-                    min = 0;
-                }
-            }
-
-            if (!text.isEmpty() || !regularExpressions.isEmpty() && es.head == null) {
-                es.add(new Expression(text, min, max == 0 ? min : max));
-            }
-
-            return es;
-        }
-
-        static List<String> parse(String regex) {
-            List<String> regExs = new ArrayList<>();
             int pos = 0;
-            String text = "";
+            regex = regex == null ? "" : regex;
 
             while (pos < regex.length()) {
-                if (regex.substring(pos).startsWith("?")) {
-                    if (!text.isEmpty()) {
-                        regExs.add(text);
-                        text = "";
-                    }
-                    regExs.add("?");
-                } else if (regex.charAt(pos) == '*') {
-                    if (!text.isEmpty()) {
-                        regExs.add(text);
-                        text = "";
-                    }
-                    regExs.add("*");
-                } else {
-                    text += regex.charAt(pos);
+                String text = "";
+                int max = 0;
+                int min = 0;
+                while (pos < regex.length() && regex.charAt(pos) != '*' && regex.charAt(pos) != '?') {
+                    text += regex.charAt(pos++);
                 }
-                pos++;
+                while (pos < regex.length() && (regex.charAt(pos) == '*' || regex.charAt(pos) == '?')) {
+                    if (regex.charAt(pos++) == '*') {
+                        max = Integer.MAX_VALUE;
+                    } else {
+                        min++;
+                    }
+                }
+                es.add(new Expression(text, min, max));
             }
-
-            if (!text.isEmpty()) {
-                regExs.add(text);
-            }
-
-            return regExs;
-        }
-
-        static String optimize(String regex) {
-            regex = regex == null ? "" : regex;
-            while (regex.contains("*?")) {
-                regex = regex.replace("*?", "?*");
-            }
-            while (regex.contains("**")) {
-                regex = regex.replace("**", "*");
-            }
-            return regex;
+            return es;
         }
     }
 
@@ -225,7 +164,7 @@ public class Solution044 {
 
         @Override
         public String toString() {
-            return String.format("%s[%s, %d, %d]", getClass().getSimpleName(), text, min, max);
+            return String.format("%s[%s, %d, %d, %d]", getClass().getSimpleName(), text, min, max, span);
         }
     }
 
@@ -240,12 +179,32 @@ public class Solution044 {
             end = this.input.length();
         }
 
-        void trimLeft(int trim) {
-            beg += Math.min(trim, end);
+        int indexOf(Expression e) {
+            int pos = 0;
+            if (e.isSpanLimited() && e.prev != null && !e.prev.isSpanLimited() && e.next != null) {
+                pos = text(e).indexOf(e.text, pos);
+                while (pos >= 0 && text(e).indexOf(e.next.text, pos + e.text.length() + e.min) < 0) {
+                    pos = text(e).indexOf(e.text, pos + 1);
+                }
+            } else if (e.prev != null && !e.prev.isSpanLimited() && e.next == null) {
+                pos = text(e).lastIndexOf(e.text);
+            } else {
+                pos = text(e).indexOf(e.text);
+            }
+            return pos;
         }
 
-        void trimAll() {
-            beg = end;
+        void trim(Expression e) {
+            if (e.next == null && !e.isSpanLimited()) {
+                beg = end;
+            } else {
+                beg += Math.min(e.span, end);
+                beg = e.span;
+                while (e.prev != null) {
+                    e = e.prev;
+                    beg += e.span;
+                }
+            }
         }
 
         String text() {
