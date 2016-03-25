@@ -198,7 +198,6 @@ public class Solution044 {
             if (e.next == null && !e.isSpanLimited()) {
                 beg = end;
             } else {
-                beg += Math.min(e.span, end);
                 beg = e.span;
                 while (e.prev != null) {
                     e = e.prev;
